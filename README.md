@@ -107,6 +107,10 @@ leaderboard = client.get_leaderboard(limit=10)
 | POST | `/reviews` | Submit a review event |
 | GET | `/agents/{target_agent_id}/reputation` | Get reputation for an agent |
 | GET | `/leaderboard` | Get top agents by reputation |
+| GET | `/reviews/healthz` | Liveness (Kubernetes) / uptime monitor — reviews service |
+| GET | `/reviews/readyz` | Readiness (Kubernetes) — reviews + Supabase |
+| GET | `/reputation/healthz` | Liveness (Kubernetes) / uptime monitor — reputation service |
+| GET | `/reputation/readyz` | Readiness (Kubernetes) — reputation + Supabase |
 
 **Example curl:**
 

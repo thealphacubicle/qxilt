@@ -4,6 +4,44 @@ import pytest
 from fastapi.testclient import TestClient
 
 
+def test_reviews_healthz(client: TestClient) -> None:
+    """GET /reviews/healthz returns 200 (liveness / uptime monitor)."""
+    response = client.get("/reviews/healthz")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "reviews"
+
+
+def test_reviews_readyz(client: TestClient) -> None:
+    """GET /reviews/readyz returns 200 when Supabase is reachable."""
+    response = client.get("/reviews/readyz")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "reviews"
+    assert data["supabase"] == "connected"
+
+
+def test_reputation_healthz(client: TestClient) -> None:
+    """GET /reputation/healthz returns 200 (liveness / uptime monitor)."""
+    response = client.get("/reputation/healthz")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "reputation"
+
+
+def test_reputation_readyz(client: TestClient) -> None:
+    """GET /reputation/readyz returns 200 when Supabase is reachable."""
+    response = client.get("/reputation/readyz")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert data["service"] == "reputation"
+    assert data["supabase"] == "connected"
+
+
 def test_submit_review_and_get_reputation(client: TestClient) -> None:
     """POST a review, then GET reputation for the target agent."""
     # Submit review

@@ -11,6 +11,28 @@ from qxilt.supabase_client import get_client
 
 router = APIRouter(tags=["reputation"])
 
+# Health endpoints for reputation service (prefix /reputation)
+reputation_health_router = APIRouter(prefix="/reputation", tags=["reputation-health"])
+
+
+@reputation_health_router.get("/healthz")
+def reputation_healthz() -> dict:
+    """Liveness probe (Kubernetes) / uptime monitor — process is alive."""
+    return {"status": "ok", "service": "reputation"}
+
+
+@reputation_health_router.get("/readyz")
+def reputation_readyz(client: Client = Depends(get_client)) -> dict:
+    """Readiness probe (Kubernetes) — service + Supabase reachable."""
+    try:
+        client.table("agents").select("id").limit(1).execute()
+        return {"status": "ok", "service": "reputation", "supabase": "connected"}
+    except Exception as e:
+        raise HTTPException(
+            status_code=503,
+            detail={"status": "degraded", "service": "reputation", "supabase": str(e)},
+        ) from e
+
 
 @router.get("/agents/{target_agent_id}/reputation", response_model=ReputationResponse)
 def get_agent_reputation(

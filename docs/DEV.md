@@ -15,6 +15,7 @@ This document provides detailed technical instructions for setting up the Qxilt 
 7. [Hosted Supabase (Production) Setup](#hosted-supabase-production-setup)
 8. [Environment Variables](#environment-variables)
 9. [Troubleshooting](#troubleshooting)
+10. [Health Endpoints (Kubernetes & Uptime Monitors)](#health-endpoints-kubernetes--uptime-monitors)
 
 ---
 
@@ -144,9 +145,10 @@ make dev-setup
 This script:
 
 1. Starts Supabase local (`supabase start`)
-2. Resets the DB (runs migrations + seed)
-3. Creates `.env.local` from `.env.local.example` if missing
-4. Injects `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from `supabase status`
+2. If the DB already has data → applies migrations only (`supabase migration up`), skips seed
+3. If the DB is empty → resets and seeds (`supabase db reset`)
+4. Creates `.env.local` from `.env.local.example` if missing
+5. Injects `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` from `supabase status`
 
 ### 3. Manual setup
 
@@ -260,3 +262,17 @@ supabase migration list
 
 - Ensure `supabase start` has completed successfully
 - Verify `SUPABASE_URL` in `.env.local` matches the output of `supabase status`
+
+---
+
+## Health Endpoints (Kubernetes & Uptime Monitors)
+
+Per-service health endpoints:
+
+| Service | Liveness (`healthz`) | Readiness (`readyz`) |
+|---------|----------------------|----------------------|
+| Reviews | `GET /reviews/healthz` | `GET /reviews/readyz` |
+| Reputation | `GET /reputation/healthz` | `GET /reputation/readyz` |
+
+- **healthz** — Liveness probe / uptime monitor. Returns 200 if the process is alive. Use for Kubernetes `livenessProbe` or UptimeRobot/Pingdom.
+- **readyz** — Readiness probe. Returns 200 if the service and Supabase are reachable. Use for Kubernetes `readinessProbe`.

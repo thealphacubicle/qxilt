@@ -22,6 +22,12 @@ class MockSupabaseClient:
         self._reviews: list[dict[str, Any]] = []
         self._agents: set[str] = set()
 
+    def table(self, name: str) -> MagicMock:
+        """Mock table() for health checks (select().limit().execute())."""
+        mock = MagicMock()
+        mock.select.return_value.limit.return_value.execute.return_value = MagicMock(data=[])
+        return mock
+
     def rpc(self, name: str, params: dict[str, Any]) -> MagicMock:
         """Mock RPC calls."""
         result = MagicMock()

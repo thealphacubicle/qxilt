@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Dev setup: start Supabase, reset DB, create .env.local from example if missing,
-# and optionally inject API URL + service_role key from supabase status.
+# Dev setup: start Supabase, reset DB (or apply migrations only if data exists),
+# create .env.local from example if missing, inject API URL + service_role key.
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,8 +14,20 @@ echo "==> Starting Supabase local..."
 supabase start
 
 echo ""
-echo "==> Resetting DB (migrations + seed)..."
-supabase db reset
+# Check if DB already has data — if so, apply migrations only (no seed)
+DB_URL=$(supabase status -o env 2>/dev/null | grep -E '^DB_URL=' | cut -d= -f2- | tr -d '"' | head -1)
+if [[ -z "$DB_URL" ]]; then
+  DB_URL="postgresql://postgres:postgres@127.0.0.1:54322/postgres"
+fi
+
+AGENT_COUNT=$(psql "$DB_URL" -t -A -c "SELECT COUNT(*) FROM public.agents" 2>/dev/null || echo "0")
+if [[ "${AGENT_COUNT:-0}" -gt 0 ]]; then
+  echo "==> DB has data — applying migrations only (skipping seed)..."
+  supabase migration up
+else
+  echo "==> Resetting DB (migrations + seed)..."
+  supabase db reset
+fi
 
 echo ""
 if [[ ! -f "$ENV_LOCAL" ]]; then

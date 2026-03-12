@@ -6,7 +6,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from qxilt.api.routes_reputation import router as reputation_router
+from qxilt.api.routes_reputation import reputation_health_router, router as reputation_router
 from qxilt.api.routes_reviews import router as reviews_router
 
 logger = logging.getLogger(__name__)
@@ -37,3 +37,4 @@ app = FastAPI(
 app.add_exception_handler(Exception, catch_all_exception_handler)
 app.include_router(reviews_router)
 app.include_router(reputation_router)
+app.include_router(reputation_health_router)
