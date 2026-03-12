@@ -15,7 +15,8 @@ This document provides detailed technical instructions for setting up the Qxilt 
 7. [Hosted Supabase (Production) Setup](#hosted-supabase-production-setup)
 8. [Environment Variables](#environment-variables)
 9. [Troubleshooting](#troubleshooting)
-10. [Health Endpoints (Kubernetes & Uptime Monitors)](#health-endpoints-kubernetes--uptime-monitors)
+10. [Docker](#docker)
+11. [Health Endpoints (Kubernetes & Uptime Monitors)](#health-endpoints-kubernetes--uptime-monitors)
 
 ---
 
@@ -262,6 +263,43 @@ supabase migration list
 
 - Ensure `supabase start` has completed successfully
 - Verify `SUPABASE_URL` in `.env.local` matches the output of `supabase status`
+
+---
+
+## Docker
+
+Two Dockerfiles use **Python 3.12** and **uv** for fast builds:
+
+| File | Use case |
+|------|----------|
+| `Dockerfile.dev` | Development — hot reload, dev deps |
+| `Dockerfile.prod` | Production — minimal, prod deps only |
+
+### Build
+
+```bash
+make docker-build-dev   # qxilt:dev
+make docker-build-prod  # qxilt:prod
+```
+
+Or: `docker build -f Dockerfile.dev -t qxilt:dev .`
+
+### Run
+
+```bash
+# Dev (hot reload, env from file)
+docker run -p 8000:8000 --env-file .env.local qxilt:dev
+
+# Prod
+docker run -p 8000:8000 --env-file .env qxilt:prod
+```
+
+### Fast builds
+
+- **uv** — much faster than pip
+- **Cache mount** — `--mount=type=cache,target=/root/.cache/uv` reuses dependencies across builds
+- **Layered deps** — `pyproject.toml` + `uv.lock` in a separate layer; code-only changes skip dependency reinstall
+- **.dockerignore** — excludes `.venv`, tests, docs, env files
 
 ---
 

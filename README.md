@@ -132,6 +132,18 @@ API tests use a mocked Supabase client; no running instance is required. For int
 
 ---
 
+## Docker
+
+```bash
+make docker-build-dev   # Dev image (hot reload)
+make docker-build-prod # Prod image
+docker run -p 8000:8000 --env-file .env qxilt:prod
+```
+
+See [docs/DEV.md](docs/DEV.md#docker) for details.
+
+---
+
 ## Project Structure
 
 ```
