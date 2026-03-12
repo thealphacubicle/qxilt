@@ -151,23 +151,21 @@ This script:
 ### 3. Manual setup
 
 ```bash
-# Start Supabase
 supabase start
-
-# Reset DB (migrations + seed)
 supabase db reset
-
-# Create env file
 cp .env.local.example .env.local
-
-# Get credentials from supabase status
-supabase status
-
-# Paste API_URL and SERVICE_ROLE_KEY into .env.local
-# Or use: supabase status -o env
+# Paste API_URL and SERVICE_ROLE_KEY from: supabase status
 ```
 
-### 4. Seed data
+### 4. Shutting down dev resources
+
+To stop local Supabase (dev only, does not affect hosted/prod):
+
+```bash
+make dev-stop
+```
+
+### 5. Seed data
 
 `supabase/seed.sql` inserts sample agents and reviews for local testing:
 
