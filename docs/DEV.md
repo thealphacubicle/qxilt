@@ -287,12 +287,18 @@ Or: `docker build -f Dockerfile.dev -t qxilt:dev .`
 ### Run
 
 ```bash
-# Dev (hot reload, env from file)
-docker run -p 8000:8000 --env-file .env.local qxilt:dev
-
-# Prod
+# Prod (hosted Supabase)
 docker run -p 8000:8000 --env-file .env qxilt:prod
+
+# Dev with local Supabase — use host.docker.internal so the container can reach Supabase on the host
+docker run -p 8000:8000 --env-file .env.local \
+  -e SUPABASE_URL=http://host.docker.internal:54321 \
+  qxilt:dev
 ```
+
+**Local Supabase from Docker:** `localhost` inside the container refers to the container itself. Use `host.docker.internal` (Mac/Windows) so the API can reach Supabase running on your host. On Linux, use `--add-host=host.docker.internal:host-gateway` or your host's IP.
+
+Quick run with local Supabase: `make docker-run-dev` (overrides `SUPABASE_URL` to `http://host.docker.internal:54321`).
 
 ### Fast builds
 

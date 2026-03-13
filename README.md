@@ -140,7 +140,7 @@ make docker-build-prod # Prod image
 docker run -p 8000:8000 --env-file .env qxilt:prod
 ```
 
-See [docs/DEV.md](docs/DEV.md#docker) for details.
+**Local Supabase:** Use `-e SUPABASE_URL=http://host.docker.internal:54321` so the container can reach Supabase on your host. See [docs/DEV.md](docs/DEV.md#docker).
 
 ---
 

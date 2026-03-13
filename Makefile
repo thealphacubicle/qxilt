@@ -1,4 +1,4 @@
-.PHONY: dev prod install test dev-setup dev-stop docker-build-dev docker-build-prod help
+.PHONY: dev prod install test dev-setup dev-stop docker-build-dev docker-build-prod docker-run-dev docker-run-prod help
 
 help:
 	@echo "Qxilt Makefile"
@@ -9,8 +9,10 @@ help:
 	@echo "  make test             Run pytest"
 	@echo "  make dev-setup        Start Supabase, reset DB, create .env.local"
 	@echo "  make dev-stop         Stop dev resources (local Supabase only)"
-	@echo "  make docker-build-dev Build Docker image (dev, hot reload)"
+	@echo "  make docker-build-dev  Build Docker image (dev, hot reload)"
 	@echo "  make docker-build-prod Build Docker image (prod)"
+	@echo "  make docker-run-dev    Run dev container (local Supabase via host.docker.internal)"
+	@echo "  make docker-run-prod  Run prod container"
 
 dev:
 	QXILT_ENV=dev uvicorn qxilt.api.main:app --reload
@@ -35,3 +37,9 @@ docker-build-dev:
 
 docker-build-prod:
 	docker build -f Dockerfile.prod -t qxilt:prod .
+
+docker-run-dev:
+	docker run -p 8000:8000 --env-file .env.local -e SUPABASE_URL=http://host.docker.internal:54321 qxilt:dev
+
+docker-run-prod:
+	docker run -p 8000:8000 --env-file .env qxilt:prod
