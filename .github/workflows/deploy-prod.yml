@@ -24,6 +24,6 @@ jobs:
 
       - name: Deploy to Koyeb
         run: |
-          koyeb service redeploy qxilt-api-prod/api
+          koyeb service redeploy qxilt/qxilt-api
         env:
           KOYEB_TOKEN: ${{ secrets.KOYEB_API_TOKEN }}
